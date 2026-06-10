@@ -1,0 +1,1880 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Финансовая модель кафе-бара в Белграде | 3-Statement Model</title>
+  <meta name="description" content="Интерактивная 3-Statement финансовая модель для открытия кафе-бара в Белграде с бюджетом 20-25k евро. Помесячные прогнозы и расчет окупаемости.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #080c14;
+      --card-bg: rgba(17, 24, 39, 0.6);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --primary: #00d2ff;
+      --primary-glow: rgba(0, 210, 255, 0.15);
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.15);
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --accent-grad: linear-gradient(135deg, #00d2ff 0%, #10b981 100%);
+      --glass-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.5);
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding: 2rem 1.5rem;
+      background-image: 
+        radial-gradient(circle at 5% 10%, rgba(0, 210, 255, 0.05) 0%, transparent 35%),
+        radial-gradient(circle at 95% 90%, rgba(16, 185, 129, 0.05) 0%, transparent 35%);
+      background-attachment: fixed;
+    }
+
+    header {
+      max-width: 1400px;
+      margin: 0 auto 2.5rem auto;
+      text-align: center;
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      margin-bottom: 0.5rem;
+      background: var(--accent-grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      font-weight: 300;
+    }
+
+    .badge-container {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      padding: 0.4rem 1rem;
+      border-radius: 99px;
+      margin-top: 0.75rem;
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      background-color: var(--success);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--success);
+    }
+
+    .badge-text {
+      font-size: 0.82rem;
+      font-weight: 500;
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 2rem;
+    }
+
+    @media (max-width: 1100px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: var(--glass-shadow);
+      transition: var(--transition);
+    }
+
+    .glass-card:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .grid-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .metric-card {
+      background: rgba(10, 15, 26, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+      background: var(--primary);
+    }
+
+    .metric-card.success::before {
+      background: var(--success);
+    }
+
+    .metric-card.warning::before {
+      background: var(--warning);
+    }
+
+    .metric-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+      display: block;
+    }
+
+    .metric-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .metric-unit {
+      font-size: 0.95rem;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    /* Tabs Layout */
+    .tab-buttons {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.25rem;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      background: var(--primary-glow);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Table styling for 3-Statement Forecast */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      background: rgba(10, 15, 26, 0.4);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 0.82rem;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 0.75rem 0.85rem;
+      border-bottom: 1px solid var(--card-border);
+      border-right: 1px solid var(--card-border);
+      white-space: nowrap;
+    }
+
+    th:last-child, td:last-child {
+      border-right: none;
+    }
+
+    th {
+      background: rgba(21, 29, 43, 0.9);
+      color: var(--text-main);
+      font-weight: 600;
+      border-top: 1px solid var(--card-border);
+    }
+
+    /* Sticky Labels Column */
+    td.label-cell {
+      font-weight: 500;
+      color: var(--text-main);
+      position: sticky;
+      left: 0;
+      background: #111827; /* Solid background matching card */
+      z-index: 2;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+      border-right: 2px solid var(--card-border);
+    }
+
+    th.label-cell {
+      position: sticky;
+      left: 0;
+      background: #1f2937;
+      z-index: 3;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+      border-right: 2px solid var(--card-border);
+    }
+
+    tr.section-header td {
+      background: rgba(0, 210, 255, 0.08) !important;
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 0.88rem;
+      border-right: none;
+    }
+
+    tr.total-row td {
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.03) !important;
+      border-top: 1px solid var(--text-muted);
+      border-bottom: 3px double var(--text-main);
+    }
+
+    tr.check-row td {
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.1) !important;
+      color: var(--success);
+    }
+
+    tr:nth-child(even) td:not(.label-cell) {
+      background-color: rgba(255, 255, 255, 0.01);
+    }
+
+    tr:hover td {
+      background-color: rgba(0, 210, 255, 0.05) !important;
+    }
+
+    /* Financial colors */
+    .negative {
+      color: #f87171;
+      font-weight: 500;
+    }
+
+    .positive {
+      color: #34d399;
+      font-weight: 500;
+    }
+
+    /* Calculator styling */
+    .calculator-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 0.5rem;
+    }
+
+    .input-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .input-label-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.4rem;
+      font-size: 0.85rem;
+    }
+
+    .input-label {
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .input-val {
+      font-family: 'Outfit', sans-serif;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 99px;
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 0 8px var(--primary);
+      transition: var(--transition);
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    /* SVG Chart */
+    .chart-container {
+      margin-top: 1.5rem;
+      background: rgba(10, 15, 26, 0.5);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1rem;
+      height: 250px;
+    }
+
+    .chart-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Cost Lists */
+    .cost-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .cost-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+    }
+
+    .cost-name {
+      font-size: 0.88rem;
+    }
+
+    .cost-value {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    /* Recommendations grid */
+    .recommendations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .rec-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+
+    .rec-header {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .rec-icon {
+      font-size: 1.2rem;
+    }
+
+    .rec-body {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .rec-body ul {
+      margin-top: 0.5rem;
+      padding-left: 1rem;
+    }
+
+    .rec-body li {
+      margin-bottom: 0.25rem;
+    }
+
+    .insight-card {
+      background: rgba(245, 158, 11, 0.06);
+      border: 1px dashed rgba(245, 158, 11, 0.25);
+      padding: 1rem;
+      border-radius: 10px;
+      margin-top: 1.25rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .insight-icon {
+      color: var(--warning);
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .insight-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .insight-title {
+      font-weight: 600;
+      color: var(--warning);
+      margin-bottom: 0.15rem;
+    }
+
+    /* Chart Legend */
+    .chart-legend {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+    .capex-input {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      color: var(--primary);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.2rem 0.4rem;
+      width: 75px;
+      text-align: right;
+      outline: none;
+      transition: var(--transition);
+    }
+    .capex-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 5px var(--primary-glow);
+    }
+    
+    /* Design Concept Toggle styling */
+    .design-toggle {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 0.3rem;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      width: fit-content;
+    }
+    .design-toggle-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.5rem 1.25rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: var(--transition);
+    }
+    .design-toggle-btn.active {
+      color: #080c14;
+      background: var(--primary);
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+    .concept-container {
+      display: none;
+    }
+    .concept-container.active {
+      display: block;
+    }
+    
+    /* Image Modal / Lightbox for mobile-friendly view */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      padding-top: 40px;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(6, 10, 18, 0.96);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      overflow-y: auto;
+    }
+    .modal-content-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100% - 80px);
+      width: 100%;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .modal-content {
+      display: block;
+      width: 100%;
+      max-width: 900px;
+      max-height: 75vh;
+      object-fit: contain;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      animation: zoom 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes zoom {
+      from {transform: scale(0.92); opacity: 0;}
+      to {transform: scale(1); opacity: 1;}
+    }
+    .modal-close {
+      position: absolute;
+      top: -10px;
+      right: 10px;
+      color: #fff;
+      font-size: 32px;
+      font-weight: 300;
+      cursor: pointer;
+      transition: var(--transition);
+      z-index: 10001;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+    .modal-caption {
+      margin-top: 15px;
+      text-align: center;
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      max-width: 90%;
+    }
+    
+    /* Modal image fade transition */
+    .modal-content {
+      transition: opacity 0.12s ease;
+    }
+
+    /* Counter badge (e.g. "2 / 5") */
+    .modal-counter {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 99px;
+      padding: 0.25rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      white-space: nowrap;
+      z-index: 10001;
+    }
+
+    /* Nav row: prev / next buttons */
+    .modal-nav {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .modal-nav-btn {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--text-main);
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      line-height: 1;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .modal-nav-btn:hover,
+    .modal-nav-btn:active {
+      background: rgba(0, 210, 255, 0.15);
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: scale(1.08);
+    }
+    
+    .gallery-img {
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .gallery-img:hover {
+      transform: scale(1.02);
+      filter: brightness(1.08);
+    }
+    
+    /* ============================================================
+       ПОЛНАЯ МОБИЛЬНАЯ АДАПТАЦИЯ
+    ============================================================ */
+    @media (max-width: 768px) {
+
+      /* --- Base --- */
+      body {
+        padding: 1rem 0.75rem;
+      }
+
+      /* --- Header --- */
+      header {
+        margin-bottom: 1.5rem;
+      }
+      h1 {
+        font-size: 1.65rem;
+        letter-spacing: -0.02em;
+      }
+      .subtitle {
+        font-size: 0.9rem;
+      }
+
+      /* --- Main grid: single column --- */
+      main {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+      }
+
+      /* --- Metric cards: 2 per row on phone --- */
+      .grid-metrics {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+      }
+      .metric-card {
+        padding: 0.9rem 0.75rem;
+      }
+      .metric-value {
+        font-size: 1.3rem;
+      }
+      .metric-label {
+        font-size: 0.72rem;
+      }
+
+      /* --- Glass card padding --- */
+      .glass-card {
+        padding: 1rem 0.9rem;
+        border-radius: 12px;
+      }
+
+      /* --- Tab buttons: wrap, full-width friendly --- */
+      .tab-buttons {
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        padding-bottom: 0.6rem;
+        margin-bottom: 1rem;
+      }
+      .tab-btn {
+        font-size: 0.78rem;
+        padding: 0.5rem 0.7rem;
+        border-radius: 6px;
+        flex: 1 1 auto;
+        text-align: center;
+        min-width: 0;
+      }
+
+      /* --- Table: always scrollable, readable label column --- */
+      .table-container {
+        -webkit-overflow-scrolling: touch;
+      }
+      table {
+        font-size: 0.72rem;
+      }
+      th, td {
+        padding: 0.55rem 0.6rem;
+        white-space: nowrap;
+      }
+      td.label-cell {
+        min-width: 120px;
+        max-width: 150px;
+        font-size: 0.72rem;
+        white-space: normal;
+        word-break: break-word;
+        line-height: 1.3;
+      }
+
+      /* --- Chart --- */
+      .chart-container {
+        height: 190px;
+      }
+
+      /* --- Calculator (right panel) --- */
+      .calculator-title {
+        font-size: 1.1rem;
+      }
+      .input-label-row {
+        font-size: 0.8rem;
+      }
+      input[type="range"] {
+        height: 6px;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        width: 22px;
+        height: 22px;
+      }
+
+      /* --- CapEx input fields: wider on mobile --- */
+      .capex-input {
+        width: 90px;
+        font-size: 0.85rem;
+        padding: 0.3rem 0.5rem;
+      }
+      .cost-item {
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        padding: 0.65rem 0.75rem;
+      }
+      .cost-name {
+        font-size: 0.82rem;
+        flex: 1 1 100%;
+      }
+      .cost-item > div {
+        margin-left: auto;
+      }
+
+      /* --- Recommendations grid: single column --- */
+      .recommendations-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      /* --- Design toggle: full width, wrap --- */
+      .design-toggle {
+        width: 100%;
+        flex-wrap: wrap;
+      }
+      .design-toggle-btn {
+        flex: 1 1 auto;
+        text-align: center;
+        padding: 0.55rem 0.5rem;
+        font-size: 0.8rem;
+      }
+
+      /* --- Gallery: 1 column on small screens --- */
+      .concept-container > div {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* --- Insight card --- */
+      .insight-card {
+        padding: 0.85rem;
+      }
+      .insight-text {
+        font-size: 0.78rem;
+      }
+
+      /* --- Modal / Lightbox --- */
+      .modal {
+        padding-top: 10px;
+      }
+      .modal-content-wrapper {
+        padding: 10px;
+        min-height: calc(100% - 40px);
+      }
+      .modal-close {
+        top: 5px;
+        right: 10px;
+        width: 44px;
+        height: 44px;
+        font-size: 28px;
+      }
+      .modal-content {
+        max-height: 70vh;
+      }
+      .modal-caption {
+        font-size: 0.9rem;
+      }
+    }
+
+    /* Extra small: 380px and below */
+    @media (max-width: 400px) {
+      h1 {
+        font-size: 1.35rem;
+      }
+      .grid-metrics {
+        grid-template-columns: 1fr;
+      }
+      .tab-btn {
+        font-size: 0.72rem;
+        padding: 0.45rem 0.5rem;
+      }
+      .metric-value {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Интегрированная 3-Statement Модель</h1>
+    <p class="subtitle">Финансовое планирование и окупаемость кафе-бара в Белграде</p>
+    <div class="badge-container">
+      <span class="badge-dot"></span>
+      <span class="badge-text" id="status-badge">Капитал: 24,000 €</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- Left Column: Forecast and Charts (with min-width: 0 to prevent grid layout break) -->
+    <div style="display: flex; flex-direction: column; gap: 2rem; min-width: 0;">
+      
+      <!-- Metrics Grid -->
+      <div class="grid-metrics">
+        <div class="metric-card">
+          <span class="metric-label">Инвестиции (CapEx)</span>
+          <span class="metric-value" id="disp-capex">24,000 <span class="metric-unit">€</span></span>
+        </div>
+        <div class="metric-card success">
+          <span class="metric-label">Чистая прибыль Y1</span>
+          <span class="metric-value" id="disp-y1profit">26,000 <span class="metric-unit">€</span></span>
+        </div>
+        <div class="metric-card warning">
+          <span class="metric-label">Срок окупаемости</span>
+          <span class="metric-value" id="disp-payback">10.0 <span class="metric-unit">мес.</span></span>
+        </div>
+      </div>
+
+      <!-- Main Forecast Table Card -->
+      <div class="glass-card">
+        <div class="tab-buttons">
+          <button class="tab-btn active" onclick="switchTab('forecast')">Помесячный прогноз (3-Statement)</button>
+          <button class="tab-btn" onclick="switchTab('capex')">Начальные расходы (CapEx)</button>
+          <button class="tab-btn" onclick="switchTab('insights')">Рекомендации</button>
+          <button class="tab-btn" onclick="switchTab('design')">Меню и Интерьер</button>
+        </div>
+
+        <!-- Tab 1: Forecast Table -->
+        <div class="tab-content active" id="tab-forecast">
+          <div class="table-container">
+            <table id="forecast-table">
+              <thead>
+                <tr id="table-header-row">
+                  <th class="label-cell">Статья</th>
+                  <th>Ед.</th>
+                  <th>М0</th>
+                  <th>М1</th>
+                  <th>М2</th>
+                  <th>М3</th>
+                  <th>М4</th>
+                  <th>М5</th>
+                  <th>М6</th>
+                  <th>М7</th>
+                  <th>М8</th>
+                  <th>М9</th>
+                  <th>М10</th>
+                  <th>М11</th>
+                  <th>М12</th>
+                  <th>Итого Y1</th>
+                </tr>
+              </thead>
+              <tbody id="table-body">
+                <!-- Programmatically generated -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Embedded Chart (Visible only on Forecast Tab) -->
+          <div style="margin-top: 2rem; border-top: 1px solid var(--card-border); padding-top: 1.5rem;">
+            <h3 class="calculator-title" style="font-size: 1.2rem; border-bottom: none; margin-bottom: 0.75rem;">Тренды доходов и прибыли</h3>
+            <div class="chart-container" style="background: rgba(10, 15, 26, 0.3);">
+              <svg class="chart-svg" id="chart-svg" viewBox="0 0 600 200">
+                <!-- Dynamic SVG elements will be appended here -->
+              </svg>
+            </div>
+            <div class="chart-legend" style="margin-top: 0.75rem;">
+              <div class="legend-item">
+                <div class="legend-color" style="background: var(--primary);"></div>
+                <span>Выручка (EUR)</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: var(--success);"></div>
+                <span>Чистая прибыль (EUR)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: CapEx Details -->
+        <div class="tab-content" id="tab-capex">
+          <div class="cost-list">
+            <div class="cost-item">
+              <span class="cost-name">Аренда помещения (депозит 2 мес + 1 мес предоплаты)</span>
+              <div>
+                <input type="number" id="capex-rent-val" class="capex-input" value="1800" oninput="onInputCapexChange()"> <span style="font-size: 0.95rem; color: var(--text-muted);">€</span>
+              </div>
+            </div>
+            <div class="cost-item">
+              <span class="cost-name">Ремонт, дизайн, отделка и вентиляция (амортизируется)</span>
+              <div>
+                <input type="number" id="capex-reno-val" class="capex-input" value="8000" oninput="onInputCapexChange()"> <span style="font-size: 0.95rem; color: var(--text-muted);">€</span>
+              </div>
+            </div>
+            <div class="cost-item">
+              <span class="cost-name">Профессиональное б/у барное оборудование (амортизируется)</span>
+              <div>
+                <input type="number" id="capex-equip-val" class="capex-input" value="3500" oninput="onInputCapexChange()"> <span style="font-size: 0.95rem; color: var(--text-muted);">€</span>
+              </div>
+            </div>
+            <div class="cost-item">
+              <span class="cost-name">Мебель для зала и барной стойки (амортизируется)</span>
+              <div>
+                <input type="number" id="capex-furn-val" class="capex-input" value="3000" oninput="onInputCapexChange()"> <span style="font-size: 0.95rem; color: var(--text-muted);">€</span>
+              </div>
+            </div>
+            <div class="cost-item">
+              <span class="cost-name">Первоначальный товарный запас (оборотный капитал)</span>
+              <div>
+                <input type="number" id="capex-inv-val" class="capex-input" value="2000" oninput="onInputCapexChange()"> <span style="font-size: 0.95rem; color: var(--text-muted);">€</span>
+              </div>
+            </div>
+            <div class="cost-item">
+              <span class="cost-name">Регистрация (APR), юрист, вывеска, маркетинг на открытие</span>
+              <div>
+                <input type="number" id="capex-open-val" class="capex-input" value="1700" oninput="onInputCapexChange()"> <span style="font-size: 0.95rem; color: var(--text-muted);">€</span>
+              </div>
+            </div>
+            <div class="cost-item">
+              <span class="cost-name">Резерв оборотного капитала (кэш на первые месяцы)</span>
+              <div>
+                <input type="number" id="capex-reserve-val" class="capex-input" value="4000" oninput="onInputCapexChange()"> <span style="font-size: 0.95rem; color: var(--text-muted);">€</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Рекомендации -->
+        <div class="tab-content" id="tab-insights">
+          <div class="recommendations-grid" style="margin-top: 0.5rem;">
+            <div class="rec-card">
+              <div class="rec-header">
+                <span class="rec-icon">📊</span>
+                <span>1. Анализ показателей и источники</span>
+              </div>
+              <div class="rec-body">
+                Проверка ключевых параметров по официальным источникам и базам данных:
+                <ul>
+                  <li><strong>Средний чек (300 RSD / 2.56 €):</strong> Соответствует реальности. По данным портала <a href="https://www.numbeo.com/cost-of-living/in/Belgrade" target="_blank" style="color: var(--primary);">Numbeo (2026)</a> и меню доставки <a href="https://wolt.com/sr/srb/belgrade" target="_blank" style="color: var(--primary);">Wolt Belgrade</a>, чашка капучино стоит 260–320 RSD, эспрессо — 180–250 RSD. 300 RSD — отличный ориентир.</li>
+                  <li><strong>Трафик (50 гостей/день):</strong> Минимальный порог безубыточности. При 12-часовой смене это 4 гостя в час. Для качественной локации в центре стандартным считается поток в 100–120 гостей.</li>
+                  <li><strong>Бюджет 24 000 €:</strong> Реалистичен при аренде помещения «после общепита» (бывший бар/кафе). Это экономит 5-7 тыс. € на проектировании вентиляции и пожарной службе (MUP).</li>
+                </ul>
+              </div>
+            </div>
+            <div class="rec-card">
+              <div class="rec-header">
+                <span class="rec-icon">👥</span>
+                <span>2. Реальность зарплат и налоги</span>
+              </div>
+              <div class="rec-body">
+                Анализ рынка труда для бариста в Белграде:
+                <ul>
+                  <li><strong>Зарплаты на рынке:</strong> По данным порталов <a href="https://poslovi.infostud.com" target="_blank" style="color: var(--primary);">Infostud Poslovi</a> и сербского агрегатора зарплат <a href="https://www.infoplate.rs" target="_blank" style="color: var(--primary);">InfoPlate</a>, чистая зарплата (neto) бариста составляет от <strong>70 000 до 110 000 RSD</strong> (600–950 €).</li>
+                  <li><strong>Наш бюджет:</strong> Ставка 550 € нетто (64 000 RSD) является минимальной. Для стабильного сервиса и удержания людей рекомендуется закладывать 700 € нетто.</li>
+                  <li><strong>Налоги:</strong> В Сербии налоги и социальные взносы составляют около <strong>60%</strong> от чистой зарплаты. В расчете заложен коэффициент 1.6x, что обеспечивает полностью официальный ФОТ.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="rec-card">
+              <div class="rec-header">
+                <span class="rec-icon">🐌</span>
+                <span>3. Сербские реалии: Polako & Sutra</span>
+              </div>
+              <div class="rec-body">
+                Как выстраивать развитие в ритме сербской жизни:
+                <ul>
+                  <li><strong>«Polako» (Потихоньку):</strong> Любые технические процессы, ремонты и согласования затягиваются. Открытие почти гарантированно сдвинется на 1-1.5 месяца. Обязательно держите резерв в 4 000 € (заложен в CapEx) для оплаты аренды на этапе простоя.</li>
+                  <li><strong>«Sutra» (Завтра):</strong> Сроки поставщиков — величина гибкая. Договаривайтесь о поставках мебели и оборудования заблаговременно и фиксируйте штрафы за просрочку в договорах.</li>
+                  <li><strong>Летняя веранда (Bašta):</strong> Летом жизнь в Белграде перемещается на улицу. Без башты кафе теряет до 70% выручки. Проверяйте возможность установки веранды в общине (opština) до подписания аренды помещения.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="rec-card">
+              <div class="rec-header">
+                <span class="rec-icon">☕</span>
+                <span>4. Монетизация неспешности (Merak)</span>
+              </div>
+              <div class="rec-body">
+                Сербская культура потребления кофе:
+                <ul>
+                  <li><strong>Культура посиделок:</strong> Гости в Сербии могут часами общаться за одной чашкой кофе. Не пытайтесь форсировать оборачиваемость столов — это вызовет негатив.</li>
+                  <li><strong>Апсейл:</strong> Добавьте в меню качественную выпечку утром и десерты (например, знаменитое трилече или палачинке с плазмой).</li>
+                  <li><strong>Вечерняя трансформация:</strong> После 18:00 кофе перестает продаваться. Кафе должно плавно переходить в барный формат: крафтовое сербское пиво (Salto, Kabinet, Dogma) и традиционная качественная ракия с легкими закусками (мезе) увеличат средний чек.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 4: Меню и Интерьер -->
+        <div class="tab-content" id="tab-design">
+          <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+            <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6;">
+              Выберите концепцию интерьера и меню. Нажмите на любое изображение, чтобы открыть его на весь экран.
+            </p>
+            
+            <div class="design-toggle">
+              <button class="design-toggle-btn active" onclick="switchConcept('vintage')">Вариант 1: Винтажный Белград</button>
+              <button class="design-toggle-btn" onclick="switchConcept('modern')">Вариант 2: Модерн Белград</button>
+            </div>
+
+            <!-- Вариант 1: Винтажный Белград -->
+            <div id="concept-vintage" class="concept-container active">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                <!-- Меню -->
+                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                  <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--primary);">Макет Дневного Меню (Dnevni Meni)</h4>
+                  <div style="border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); aspect-ratio: 1/1;">
+                    <img src="cafe_menu_preview.png" alt="Макет меню (Винтажный Белград)" class="gallery-img" onclick="openImageModal(this.src, this.alt)" style="width: 100%; height: 100%; object-fit: cover;">
+                  </div>
+                  <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+                    <strong>Традиции:</strong> Спешелти-кофе, традиционная ракия (Viljamovka, Dunja), сербское крафтовое пиво (Zadruga, Dogma) и традиционный Балканский Мезе (пршут, каймак, айвар, сыры).
+                  </p>
+                </div>
+
+                <!-- Интерьер 1 -->
+                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                  <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--primary);">Главный зал (Кафе Зора)</h4>
+                  <div style="border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); aspect-ratio: 1/1;">
+                    <img src="interior_main_hall.png" alt="Главный зал (Винтажный Белград)" class="gallery-img" onclick="openImageModal(this.src, this.alt)" style="width: 100%; height: 100%; object-fit: cover;">
+                  </div>
+                  <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+                    <strong>Атмосфера:</strong> Мягкий рассеянный теплый свет, комнатные растения, открытая кирпичная кладка, антикварная мебель и глубокие зеленые вельветовые кресла.
+                  </p>
+                </div>
+
+                <!-- Интерьер 2 -->
+                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                  <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--primary);">Уютный уголок и книги</h4>
+                  <div style="border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); aspect-ratio: 1/1;">
+                    <img src="interior_cozy_nook.png" alt="Уютный уголок (Винтажный Белград)" class="gallery-img" onclick="openImageModal(this.src, this.alt)" style="width: 100%; height: 100%; object-fit: cover;">
+                  </div>
+                  <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+                    <strong>Уединение:</strong> Книжные полки, гирлянды с теплым светом, уютный шерстяной плед и чашечка ароматного кофе с традиционным стаканом воды.
+                  </p>
+                </div>
+
+                <!-- Интерьер 3 -->
+                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                  <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--primary);">Барная стойка и Медь</h4>
+                  <div style="border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); aspect-ratio: 1/1;">
+                    <img src="interior_bar_zone.png" alt="Барная стойка (Винтажный Белград)" class="gallery-img" onclick="openImageModal(this.src, this.alt)" style="width: 100%; height: 100%; object-fit: cover;">
+                  </div>
+                  <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+                    <strong>Барная зона:</strong> Винтажная медная и деревянная барная стойка, профессиональная эспрессо-машина Gaggia, подвесные теплые лампы Эдисона.
+                  </p>
+                </div>
+
+                <!-- Интерьер 4 -->
+                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                  <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--primary);">Винил и детали</h4>
+                  <div style="border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); aspect-ratio: 1/1;">
+                    <img src="interior_aesthetic_details.png" alt="Детали интерьера (Винтажный Белград)" class="gallery-img" onclick="openImageModal(this.src, this.alt)" style="width: 100%; height: 100%; object-fit: cover;">
+                  </div>
+                  <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+                    <strong>Эстетика:</strong> Ретро-проигрыватель с пластинками югославских рок-легенд (YU Grupa), керамика ручной работы местных сербских мастеров.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Вариант 2: Модерн Белград -->
+            <div id="concept-modern" class="concept-container">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                <!-- Меню -->
+                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                  <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--primary);">Макет Меню «Meraki Cafe»</h4>
+                  <div style="border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); aspect-ratio: 1/1;">
+                    <img src="cafe_menu_modern.png" alt="Макет меню (Модерн Белград)" class="gallery-img" onclick="openImageModal(this.src, this.alt)" style="width: 100%; height: 100%; object-fit: cover;">
+                  </div>
+                  <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+                    <strong>Тренды:</strong> Спешелти-кофе, матча латте, биодинамические и оранжевые вина, а также современные балканские закуски (sourdough тосты с каймаком и айваром, витые бореки с медом).
+                  </p>
+                </div>
+
+                <!-- Интерьер 1 -->
+                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                  <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--primary);">Светлый зал (Растко)</h4>
+                  <div style="border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); aspect-ratio: 1/1;">
+                    <img src="interior_modern_hall.png" alt="Главный зал (Модерн Белград)" class="gallery-img" onclick="openImageModal(this.src, this.alt)" style="width: 100%; height: 100%; object-fit: cover;">
+                  </div>
+                  <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+                    <strong>Стиль:</strong> Минимализм, панорамные окна, столы из светлого дуба, полы терраццо, обилие живой зелени и скандинавский дизайн.
+                  </p>
+                </div>
+
+                <!-- Интерьер 2 -->
+                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                  <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--primary);">Уголок фриланса и работы</h4>
+                  <div style="border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); aspect-ratio: 1/1;">
+                    <img src="interior_modern_nook.png" alt="Уютный уголок (Модерн Белград)" class="gallery-img" onclick="openImageModal(this.src, this.alt)" style="width: 100%; height: 100%; object-fit: cover;">
+                  </div>
+                  <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+                    <strong>Удобство:</strong> Индивидуальные споты, быстрый Wi-Fi, розетки у каждого стола, удобные эргономичные кресла для работы.
+                  </p>
+                </div>
+
+                <!-- Интерьер 3 -->
+                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                  <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--primary);">Минималистичный бар</h4>
+                  <div style="border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); aspect-ratio: 1/1;">
+                    <img src="interior_modern_bar.png" alt="Барная стойка (Модерн Белград)" class="gallery-img" onclick="openImageModal(this.src, this.alt)" style="width: 100%; height: 100%; object-fit: cover;">
+                  </div>
+                  <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+                    <strong>Барная зона:</strong> Стойка из микроцемента, современная мультибойлерная кофемашина, неоновая подсветка и минималистичный дизайн стеллажей.
+                  </p>
+                </div>
+
+                <!-- Интерьер 4 -->
+                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                  <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--primary);">Детали и посуда</h4>
+                  <div style="border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); aspect-ratio: 1/1;">
+                    <img src="interior_modern_details.png" alt="Детали интерьера (Модерн Белград)" class="gallery-img" onclick="openImageModal(this.src, this.alt)" style="width: 100%; height: 100%; object-fit: cover;">
+                  </div>
+                  <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+                    <strong>Акценты:</strong> Лаконичные картины современных сербских художников, авторская керамическая посуда в пастельных тонах.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Interactive Panel -->
+    <div class="glass-card" style="height: fit-content;">
+      <h2 class="calculator-title">Симулятор параметров</h2>
+      
+      <div class="input-group">
+        <div class="input-label-row">
+          <span class="input-label">Гостей в день (steady state)</span>
+          <span class="input-val" id="val-guests">100</span>
+        </div>
+        <input type="range" id="input-guests" min="30" max="220" value="100" oninput="runProjections()">
+      </div>
+
+      <div class="input-group">
+        <div class="input-label-row">
+          <span class="input-label">Средний чек (в RSD)</span>
+          <span class="input-val" id="val-check">300 RSD</span>
+        </div>
+        <input type="range" id="input-check" min="150" max="800" step="10" value="300" oninput="runProjections()">
+      </div>
+
+      <div class="input-group">
+        <div class="input-label-row">
+          <span class="input-label">Аренда помещения (€/мес)</span>
+          <span class="input-val" id="val-rent">600 €</span>
+        </div>
+        <input type="range" id="input-rent" min="400" max="1500" step="50" value="600" oninput="runProjections()">
+      </div>
+
+      <div class="input-group">
+        <div class="input-label-row">
+          <span class="input-label">Количество сотрудников</span>
+          <span class="input-val" id="val-staff">2 чел.</span>
+        </div>
+        <input type="range" id="input-staff" min="0" max="4" value="2" oninput="runProjections()">
+      </div>
+
+      <div class="input-group">
+        <div class="input-label-row">
+          <span class="input-label">Инвестиции (CapEx)</span>
+          <span class="input-val" id="val-capex">24,000 €</span>
+        </div>
+        <input type="range" id="input-capex" min="15000" max="30000" step="1000" value="24000" oninput="onSliderCapexChange()">
+      </div>
+
+      <div class="insight-card">
+        <div class="insight-icon">💡</div>
+        <div class="insight-text">
+          <div class="insight-title">Особенности 3-Statement модели</div>
+          Модель включает балансовую проверку и кэш-аут. В первый месяц (М1) оборотный капитал увеличивается из-за списания предоплаченной аренды, что дает положительный эффект на денежный поток.
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('tab-' + tabName).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    const exchangeRate = 117.0;
+    const cogsPct = 0.25;
+    const taxRate = 0.15;
+    const ppeUsefulLife = 60; // 5 years
+
+    function formatFinanceValue(val, isCurrency, isPct, isCheck, isDecimals) {
+      if (val < 0) {
+        let absVal = Math.abs(val);
+        let str = isDecimals ? absVal.toFixed(2) : Math.round(absVal).toLocaleString();
+        if (isCurrency) str += ' €';
+        return `<span class="negative">-${str}</span>`;
+      } else {
+        let str = isDecimals ? val.toFixed(2) : Math.round(val).toLocaleString();
+        if (isPct) str = (val * 100).toFixed(0) + '%';
+        else if (isCurrency) str += ' €';
+        
+        if (val > 0 && !isPct && !isCheck) {
+          return `<span class="positive">${str}</span>`;
+        }
+        return str;
+      }
+    }
+
+    function onSliderCapexChange() {
+      const total = parseInt(document.getElementById('input-capex').value) || 24000;
+      document.getElementById('capex-rent-val').value = Math.round(total * (1800/24000));
+      document.getElementById('capex-reno-val').value = Math.round(total * (8000/24000));
+      document.getElementById('capex-equip-val').value = Math.round(total * (3500/24000));
+      document.getElementById('capex-furn-val').value = Math.round(total * (3000/24000));
+      document.getElementById('capex-inv-val').value = Math.round(total * (2000/24000));
+      document.getElementById('capex-open-val').value = Math.round(total * (1700/24000));
+      document.getElementById('capex-reserve-val').value = Math.round(total * (4000/24000));
+      runProjections();
+    }
+
+    function onInputCapexChange() {
+      const r = parseInt(document.getElementById('capex-rent-val').value) || 0;
+      const re = parseInt(document.getElementById('capex-reno-val').value) || 0;
+      const eq = parseInt(document.getElementById('capex-equip-val').value) || 0;
+      const fu = parseInt(document.getElementById('capex-furn-val').value) || 0;
+      const inv = parseInt(document.getElementById('capex-inv-val').value) || 0;
+      const op = parseInt(document.getElementById('capex-open-val').value) || 0;
+      const res = parseInt(document.getElementById('capex-reserve-val').value) || 0;
+      const total = r + re + eq + fu + inv + op + res;
+      document.getElementById('input-capex').value = total;
+      runProjections();
+    }
+
+    function runProjections() {
+      // Inputs
+      const guestsSS = parseInt(document.getElementById('input-guests').value);
+      const checkRsd = parseInt(document.getElementById('input-check').value);
+      const rentEur = parseInt(document.getElementById('input-rent').value);
+      const staffCount = parseInt(document.getElementById('input-staff').value);
+      
+      // Read CapEx values directly from the input fields
+      const capexRent = parseInt(document.getElementById('capex-rent-val').value) || 0;
+      const capexRenovation = parseInt(document.getElementById('capex-reno-val').value) || 0;
+      const capexEquipment = parseInt(document.getElementById('capex-equip-val').value) || 0;
+      const capexFurniture = parseInt(document.getElementById('capex-furn-val').value) || 0;
+      const initialInventory = parseInt(document.getElementById('capex-inv-val').value) || 0;
+      const openingExpenses = parseInt(document.getElementById('capex-open-val').value) || 0;
+      const capexReserve = parseInt(document.getElementById('capex-reserve-val').value) || 0;
+      
+      const capexTotal = capexRent + capexRenovation + capexEquipment + capexFurniture + initialInventory + openingExpenses + capexReserve;
+
+      // Display inputs
+      document.getElementById('val-guests').innerText = guestsSS;
+      document.getElementById('val-check').innerText = checkRsd + ' RSD';
+      document.getElementById('val-rent').innerText = rentEur.toLocaleString() + ' €';
+      document.getElementById('val-staff').innerText = staffCount + ' чел.';
+      document.getElementById('val-capex').innerText = capexTotal.toLocaleString() + ' €';
+
+      const checkEur = checkRsd / exchangeRate;
+      
+      const ppeTotal = capexRenovation + capexEquipment + capexFurniture;
+      const monthlyDepreciation = ppeTotal / ppeUsefulLife;
+      const deposit = capexRent * (2/3); // 2 months deposit out of 3 months total capexRent
+
+      // Month structures
+      const rampUp = [0.0, 0.50, 0.70, 0.85, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0];
+      
+      // Arrays for statements
+      const revenue = [];
+      const cogs = [];
+      const grossProfit = [];
+      
+      // OpEx items
+      const rent = [];
+      const utilities = [];
+      const staff = [];
+      const accounting = [];
+      const misc = [];
+      
+      const opex = [];
+      const ebitda = [];
+      const da = [];
+      const ebit = [];
+      const tax = [];
+      const netIncome = [];
+
+      // BS
+      const cash = [];
+      const inventory = [];
+      const depositBS = [];
+      const prepaidRent = [];
+      const ppeNet = [];
+      const totalAssets = [];
+      const equityCapital = [];
+      const retainedEarnings = [];
+      const totalEquity = [];
+      const bsCheck = [];
+
+      // CF
+      const cfNetIncome = [];
+      const cfDa = [];
+      const cfWc = [];
+      const cfo = [];
+      const cfCapex = [];
+      const cfDeposits = [];
+      const cfi = [];
+      const cfEquity = [];
+      const cff = [];
+      const cfNetChange = [];
+      const cfBegCash = [];
+      const cfEndCash = [];
+      const cfCheck = [];
+
+      // Compute month 0 to 12
+      for (let m = 0; m <= 12; m++) {
+        // Operational Metrics
+        const guests = guestsSS * rampUp[m];
+
+        // Income Statement
+        if (m === 0) {
+          revenue.push(0);
+          cogs.push(0);
+          grossProfit.push(0);
+          rent.push(0);
+          utilities.push(0);
+          staff.push(0);
+          accounting.push(0);
+          misc.push(0);
+          opex.push(0);
+          ebitda.push(0);
+          da.push(0);
+          ebit.push(0);
+          tax.push(0);
+          netIncome.push(-openingExpenses);
+        } else {
+          const rev = checkEur * guests * 30;
+          const cg = -rev * cogsPct;
+          revenue.push(rev);
+          cogs.push(cg);
+          grossProfit.push(rev + cg);
+          
+          rent.push(-rentEur);
+          utilities.push(-300);
+          staff.push(-staffCount * 550 * 1.6);
+          accounting.push(-150);
+          misc.push(-150);
+          
+          const op = -rentEur - 300 - (staffCount * 550 * 1.6) - 150 - 150;
+          opex.push(op);
+          
+          const ebitdaVal = (rev + cg) + op;
+          ebitda.push(ebitdaVal);
+          da.push(-monthlyDepreciation);
+          
+          const ebitVal = ebitdaVal - monthlyDepreciation;
+          ebit.push(ebitVal);
+          
+          const taxVal = ebitVal > 0 ? -ebitVal * taxRate : 0;
+          tax.push(taxVal);
+          netIncome.push(ebitVal + taxVal);
+        }
+
+        // Cash Flow Statement (depends on net income)
+        cfNetIncome.push(netIncome[m]);
+        
+        if (m === 0) {
+          cfDa.push(0);
+          cfWc.push(0);
+          cfo.push(netIncome[0]);
+          cfCapex.push(-ppeTotal);
+          cfDeposits.push(-(deposit + rentEur + initialInventory));
+          cfi.push(-ppeTotal - (deposit + rentEur + initialInventory));
+          cfEquity.push(capexTotal);
+          cff.push(capexTotal);
+          
+          const netChg = cfo[0] + cfi[0] + cff[0];
+          cfNetChange.push(netChg);
+          cfBegCash.push(0);
+          cfEndCash.push(netChg);
+        } else {
+          cfDa.push(-da[m]);
+          const wcChange = m === 1 ? rentEur : 0;
+          cfWc.push(wcChange);
+          
+          const cfoVal = netIncome[m] - da[m] + wcChange;
+          cfo.push(cfoVal);
+          cfCapex.push(0);
+          cfDeposits.push(0);
+          cfi.push(0);
+          cfEquity.push(0);
+          cff.push(0);
+          
+          const netChg = cfoVal;
+          cfNetChange.push(netChg);
+          cfBegCash.push(cfEndCash[m - 1]);
+          cfEndCash.push(cfEndCash[m - 1] + netChg);
+        }
+
+        // Balance Sheet
+        cash.push(cfEndCash[m]);
+        inventory.push(initialInventory);
+        depositBS.push(deposit);
+        prepaidRent.push(m === 0 ? rentEur : 0);
+        
+        if (m === 0) {
+          ppeNet.push(ppeTotal);
+        } else {
+          ppeNet.push(ppeNet[m - 1] + da[m]);
+        }
+        
+        totalAssets.push(cash[m] + inventory[m] + depositBS[m] + prepaidRent[m] + ppeNet[m]);
+        equityCapital.push(capexTotal);
+        
+        if (m === 0) {
+          retainedEarnings.push(netIncome[0]);
+        } else {
+          retainedEarnings.push(retainedEarnings[m - 1] + netIncome[m]);
+        }
+        
+        totalEquity.push(equityCapital[m] + retainedEarnings[m]);
+        bsCheck.push(totalAssets[m] - totalEquity[m]);
+        cfCheck.push(cfEndCash[m] - cash[m]);
+      }
+
+      // Sums for Y1 (Totals Column)
+      const sum = arr => arr.slice(1).reduce((a, b) => a + b, 0);
+      const y1Revenue = sum(revenue);
+      const y1Cogs = sum(cogs);
+      const y1GrossProfit = sum(grossProfit);
+      const y1Rent = sum(rent);
+      const y1Utilities = sum(utilities);
+      const y1Staff = sum(staff);
+      const y1Accounting = sum(accounting);
+      const y1Misc = sum(misc);
+      const y1Opex = sum(opex);
+      const y1Ebitda = sum(ebitda);
+      const y1Da = sum(da);
+      const y1Ebit = sum(ebit);
+      const y1Tax = sum(tax);
+      const y1NetIncome = netIncome[0] + sum(netIncome); // include Month 0 startup expense
+
+      // Populate Metrics
+      document.getElementById('disp-capex').innerHTML = capexTotal.toLocaleString() + ' <span class="metric-unit">€</span>';
+      document.getElementById('disp-y1profit').innerHTML = formatFinanceValue(y1NetIncome, true, false, false, false);
+      
+      let paybackMonths = '∞';
+      if (y1NetIncome > 0) {
+        paybackMonths = (capexTotal / (y1NetIncome / 12)).toFixed(1);
+      }
+      document.getElementById('disp-payback').innerHTML = paybackMonths + ' <span class="metric-unit">мес.</span>';
+
+      // Badge update
+      const badgeText = document.getElementById('status-badge');
+      badgeText.innerText = 'Капитал: ' + capexTotal.toLocaleString() + ' €';
+
+      // Render Table HTML
+      const tableData = [
+        { name: "Коэффициент Ramp-up", unit: "%", values: rampUp, type: "driver", isPct: true },
+        { name: "Количество гостей в день", unit: "чел", values: rampUp.map((r, i) => guestsSS * r), type: "driver" },
+        { name: "Средний чек (в EUR)", unit: "EUR", values: rampUp.map(() => checkEur), type: "driver", isCurrency: true, isDecimals: true },
+        { name: "2. ОТЧЕТ О ПРИБЫЛЯХ И УБЫТКАХ", isHeader: true },
+        { name: "Выручка", unit: "EUR", values: revenue, isCurrency: true, total: y1Revenue },
+        { name: "Себестоимость (COGS)", unit: "EUR", values: cogs, isCurrency: true, total: y1Cogs },
+        { name: "Валовая прибыль (Gross Profit)", unit: "EUR", values: grossProfit, isCurrency: true, total: y1GrossProfit },
+        { name: "Аренда помещения", unit: "EUR", values: rent, isCurrency: true, total: y1Rent },
+        { name: "Коммунальные услуги", unit: "EUR", values: utilities, isCurrency: true, total: y1Utilities },
+        { name: "ФОТ сотрудников с налогами", unit: "EUR", values: staff, isCurrency: true, total: y1Staff },
+        { name: "Бухгалтерия и ПО", unit: "EUR", values: accounting, isCurrency: true, total: y1Accounting },
+        { name: "Прочие расходы (лицензии, расходники)", unit: "EUR", values: misc, isCurrency: true, total: y1Misc },
+        { name: "EBITDA", unit: "EUR", values: ebitda, isCurrency: true, total: y1Ebitda },
+        { name: "Амортизация (D&A)", unit: "EUR", values: da, isCurrency: true, total: y1Da },
+        { name: "Операционная прибыль (EBIT)", unit: "EUR", values: ebit, isCurrency: true, total: y1Ebit },
+        { name: "Налог на прибыль", unit: "EUR", values: tax, isCurrency: true, total: y1Tax },
+        { name: "Чистая прибыль", unit: "EUR", values: netIncome, isCurrency: true, total: y1NetIncome, isDoubleUnderline: true },
+        { name: "3. БАЛАНСОВЫЙ ОТЧЕТ", isHeader: true },
+        { name: "Денежные средства (Cash)", unit: "EUR", values: cash, isCurrency: true, total: cash[12] },
+        { name: "Товарный запас (Inventory)", unit: "EUR", values: inventory, isCurrency: true, total: inventory[12] },
+        { name: "Депозит за аренду (Deposit)", unit: "EUR", values: depositBS, isCurrency: true, total: depositBS[12] },
+        { name: "Предоплата по аренде", unit: "EUR", values: prepaidRent, isCurrency: true, total: prepaidRent[12] },
+        { name: "Основные средства (PP&E net)", unit: "EUR", values: ppeNet, isCurrency: true, total: ppeNet[12] },
+        { name: "ИТОГО АКТИВЫ", unit: "EUR", values: totalAssets, isCurrency: true, total: totalAssets[12], isDoubleUnderline: true },
+        { name: "Собственный капитал", unit: "EUR", values: equityCapital, isCurrency: true, total: equityCapital[12] },
+        { name: "Нераспределенная прибыль (RE)", unit: "EUR", values: retainedEarnings, isCurrency: true, total: retainedEarnings[12] },
+        { name: "ИТОГО ПАССИВЫ + КАПИТАЛ", unit: "EUR", values: totalEquity, isCurrency: true, total: totalEquity[12], isDoubleUnderline: true },
+        { name: "Балансовая проверка (Asset - L&E)", unit: "EUR", values: bsCheck, isCurrency: true, total: bsCheck[12], isCheck: true },
+        { name: "4. ОТЧЕТ О ДВИЖЕНИИ ДЕНЕЖНЫХ СРЕДСТВ", isHeader: true },
+        { name: "Чистая прибыль (Net Income)", unit: "EUR", values: cfNetIncome, isCurrency: true, total: y1NetIncome },
+        { name: "Корректировка: Амортизация (D&A)", unit: "EUR", values: cfDa, isCurrency: true, total: y1Da * -1 },
+        { name: "Изменение оборотного капитала", unit: "EUR", values: cfWc, isCurrency: true, total: rentEur },
+        { name: "Денежный поток от опер. деятельности (CFO)", unit: "EUR", values: cfo, isCurrency: true, total: sum(cfo) + cfo[0] },
+        { name: "Капитальные затраты (CapEx)", unit: "EUR", values: cfCapex, isCurrency: true, total: -ppeTotal },
+        { name: "Депозиты и предоплаты", unit: "EUR", values: cfDeposits, isCurrency: true, total: cfDeposits[0] },
+        { name: "Денежный поток от инвест. деятельности (CFI)", unit: "EUR", values: cfi, isCurrency: true, total: cfi[0] },
+        { name: "Привлечение собственного капитала", unit: "EUR", values: cfEquity, isCurrency: true, total: capexTotal },
+        { name: "Денежный поток от фин. деятельности (CFF)", unit: "EUR", values: cff, isCurrency: true, total: capexTotal },
+        { name: "Чистое изменение денежных средств", unit: "EUR", values: cfNetChange, isCurrency: true, total: sum(cfNetChange) + cfNetChange[0] },
+        { name: "Начальный остаток денежных средств", unit: "EUR", values: cfBegCash, isCurrency: true, total: 0 },
+        { name: "Конечный остаток денежных средств", unit: "EUR", values: cfEndCash, isCurrency: true, total: cfEndCash[12], isDoubleUnderline: true },
+        { name: "Проверка остатка (CF Ending vs BS Cash)", unit: "EUR", values: cfCheck, isCurrency: true, total: cfCheck[12], isCheck: true }
+      ];
+
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = '';
+
+      tableData.forEach(row => {
+        const tr = document.createElement('tr');
+        if (row.isHeader) {
+          tr.className = 'section-header';
+          tr.innerHTML = `<td class="label-cell">${row.name}</td><td colspan="15"></td>`;
+        } else {
+          let html = `<td class="label-cell">${row.name}</td><td>${row.unit}</td>`;
+          
+          row.values.forEach(v => {
+            html += `<td>${formatFinanceValue(v, row.isCurrency, row.isPct, row.isCheck, row.isDecimals)}</td>`;
+          });
+          
+          let totalFormatted = '-';
+          if (row.total !== undefined) {
+            totalFormatted = formatFinanceValue(row.total, row.isCurrency, false, row.isCheck, row.isDecimals);
+          }
+          html += `<td>${totalFormatted}</td>`;
+          tr.innerHTML = html;
+          
+          if (row.isDoubleUnderline) tr.className = 'total-row';
+          if (row.isCheck) tr.className = 'check-row';
+        }
+        tbody.appendChild(tr);
+      });
+
+      // Update SVG Chart
+      renderChart(revenue, netIncome);
+    }
+
+    function renderChart(revenue, netIncome) {
+      const svg = document.getElementById('chart-svg');
+      svg.innerHTML = '';
+
+      // Create definitions for gradients
+      const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+      
+      const gradRev = document.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
+      gradRev.setAttribute("id", "rev-area-grad");
+      gradRev.setAttribute("x1", "0");
+      gradRev.setAttribute("y1", "0");
+      gradRev.setAttribute("x2", "0");
+      gradRev.setAttribute("y2", "1");
+      gradRev.innerHTML = `
+        <stop offset="0%" stop-color="var(--primary)" stop-opacity="0.25"/>
+        <stop offset="100%" stop-color="var(--primary)" stop-opacity="0.0"/>
+      `;
+      defs.appendChild(gradRev);
+
+      const gradNet = document.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
+      gradNet.setAttribute("id", "net-area-grad");
+      gradNet.setAttribute("x1", "0");
+      gradNet.setAttribute("y1", "0");
+      gradNet.setAttribute("x2", "0");
+      gradNet.setAttribute("y2", "1");
+      gradNet.innerHTML = `
+        <stop offset="0%" stop-color="var(--success)" stop-opacity="0.25"/>
+        <stop offset="100%" stop-color="var(--success)" stop-opacity="0.0"/>
+      `;
+      defs.appendChild(gradNet);
+      
+      svg.appendChild(defs);
+
+      // Calculate min & max
+      const maxVal = Math.max(...revenue);
+      const minVal = Math.min(...netIncome);
+      
+      const width = 600;
+      const height = 200;
+      const padding = 35;
+      
+      const pointsRev = [];
+      const pointsNet = [];
+      
+      for (let i = 1; i <= 12; i++) {
+        const x = padding + ((width - padding * 2) / 11) * (i - 1);
+        const yRev = height - padding - ((revenue[i] / maxVal) * (height - padding * 2));
+        
+        const range = maxVal - minVal;
+        const yNet = height - padding - (((netIncome[i] - minVal) / range) * (height - padding * 2));
+        
+        pointsRev.push(`${x},${yRev}`);
+        pointsNet.push(`${x},${yNet}`);
+      }
+
+      // Add background grid lines
+      for (let j = 0; j <= 4; j++) {
+        const y = padding + ((height - padding * 2) / 4) * j;
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", padding);
+        line.setAttribute("y1", y);
+        line.setAttribute("x2", width - padding);
+        line.setAttribute("y2", y);
+        line.setAttribute("stroke", "rgba(255,255,255,0.05)");
+        svg.appendChild(line);
+      }
+
+      // Draw Area Paths first (underneath lines)
+      const areaRevPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      const xStart = padding;
+      const xEnd = width - padding;
+      const yBottom = height - padding;
+      areaRevPath.setAttribute("d", `M ${pointsRev[0]} L ${pointsRev.join(' L ')} L ${xEnd},${yBottom} L ${xStart},${yBottom} Z`);
+      areaRevPath.setAttribute("fill", "url(#rev-area-grad)");
+      svg.appendChild(areaRevPath);
+
+      const areaNetPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      areaNetPath.setAttribute("d", `M ${pointsNet[0]} L ${pointsNet.join(' L ')} L ${xEnd},${yBottom} L ${xStart},${yBottom} Z`);
+      areaNetPath.setAttribute("fill", "url(#net-area-grad)");
+      svg.appendChild(areaNetPath);
+
+      // Draw Revenue Line
+      const pathRev = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      pathRev.setAttribute("d", `M ${pointsRev.join(' L ')}`);
+      pathRev.setAttribute("fill", "none");
+      pathRev.setAttribute("stroke", "var(--primary)");
+      pathRev.setAttribute("stroke-width", "3");
+      svg.appendChild(pathRev);
+
+      // Draw Net Income Line
+      const pathNet = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      pathNet.setAttribute("d", `M ${pointsNet.join(' L ')}`);
+      pathNet.setAttribute("fill", "none");
+      pathNet.setAttribute("stroke", "var(--success)");
+      pathNet.setAttribute("stroke-width", "3");
+      svg.appendChild(pathNet);
+
+      // Add dots
+      for (let i = 0; i < 12; i++) {
+        const [xRev, yRev] = pointsRev[i].split(',');
+        const circleRev = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circleRev.setAttribute("cx", xRev);
+        circleRev.setAttribute("cy", yRev);
+        circleRev.setAttribute("r", "4");
+        circleRev.setAttribute("fill", "var(--primary)");
+        svg.appendChild(circleRev);
+
+        const [xNet, yNet] = pointsNet[i].split(',');
+        const circleNet = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circleNet.setAttribute("cx", xNet);
+        circleNet.setAttribute("cy", yNet);
+        circleNet.setAttribute("r", "4");
+        circleNet.setAttribute("fill", "var(--success)");
+        svg.appendChild(circleNet);
+      }
+
+      // Labels for months
+      for (let i = 1; i <= 12; i++) {
+        const x = padding + ((width - padding * 2) / 11) * (i - 1);
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", x);
+        text.setAttribute("y", height - 10);
+        text.setAttribute("fill", "var(--text-muted)");
+        text.setAttribute("font-size", "9px");
+        text.setAttribute("text-anchor", "middle");
+        text.textContent = `М${i}`;
+        svg.appendChild(text);
+      }
+    }
+
+    function switchConcept(concept) {
+      document.querySelectorAll('.concept-container').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.design-toggle-btn').forEach(b => b.classList.remove('active'));
+      
+      document.getElementById('concept-' + concept).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // ---- Lightbox Gallery Logic ----
+    let _galleryImages = []; // {src, alt}
+    let _galleryIndex = 0;
+    let _touchStartX = 0;
+
+    function _buildGallery() {
+      // Collect all gallery images from the currently active concept
+      const activeConceptEl = document.querySelector('.concept-container.active');
+      if (!activeConceptEl) return [];
+      const imgs = Array.from(activeConceptEl.querySelectorAll('img.gallery-img'));
+      return imgs.map(img => ({ src: img.src, alt: img.alt }));
+    }
+
+    function _renderModal() {
+      const item = _galleryImages[_galleryIndex];
+      const modalImg = document.getElementById('modal-img');
+      const captionText = document.getElementById('modal-caption');
+      const counter = document.getElementById('modal-counter');
+      const prevBtn = document.getElementById('modal-prev');
+      const nextBtn = document.getElementById('modal-next');
+
+      // Fade effect
+      modalImg.style.opacity = '0';
+      setTimeout(() => {
+        modalImg.src = item.src;
+        captionText.innerText = item.alt;
+        modalImg.style.opacity = '1';
+      }, 120);
+
+      counter.innerText = (_galleryIndex + 1) + ' / ' + _galleryImages.length;
+      prevBtn.style.opacity = _galleryImages.length > 1 ? '1' : '0';
+      nextBtn.style.opacity = _galleryImages.length > 1 ? '1' : '0';
+      prevBtn.style.pointerEvents = _galleryImages.length > 1 ? 'auto' : 'none';
+      nextBtn.style.pointerEvents = _galleryImages.length > 1 ? 'auto' : 'none';
+    }
+
+    function openImageModal(src, alt) {
+      _galleryImages = _buildGallery();
+      _galleryIndex = _galleryImages.findIndex(img => img.src.endsWith(src.split('/').pop()));
+      if (_galleryIndex < 0) _galleryIndex = 0;
+
+      document.getElementById('image-modal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+      _renderModal();
+
+      // Touch swipe
+      const modal = document.getElementById('image-modal');
+      modal.addEventListener('touchstart', _onTouchStart, { passive: true });
+      modal.addEventListener('touchend', _onTouchEnd, { passive: true });
+    }
+
+    function closeImageModal() {
+      const modal = document.getElementById('image-modal');
+      modal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+      modal.removeEventListener('touchstart', _onTouchStart);
+      modal.removeEventListener('touchend', _onTouchEnd);
+    }
+
+    function modalNavigate(dir) {
+      if (_galleryImages.length < 2) return;
+      _galleryIndex = (_galleryIndex + dir + _galleryImages.length) % _galleryImages.length;
+      _renderModal();
+    }
+
+    function _onTouchStart(e) {
+      _touchStartX = e.changedTouches[0].clientX;
+    }
+    function _onTouchEnd(e) {
+      const dx = e.changedTouches[0].clientX - _touchStartX;
+      if (Math.abs(dx) > 50) modalNavigate(dx < 0 ? 1 : -1);
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+      if (document.getElementById('image-modal').style.display !== 'block') return;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') modalNavigate(1);
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') modalNavigate(-1);
+      else if (e.key === 'Escape') closeImageModal();
+    });
+
+    // Initialize projections
+    runProjections();
+  </script>
+
+  <!-- Image Lightbox Modal with Gallery Navigation -->
+  <div id="image-modal" class="modal" onclick="if(event.target===this) closeImageModal()">
+    <div class="modal-content-wrapper">
+      <span class="modal-close" onclick="closeImageModal()" title="Закрыть (Esc)">&times;</span>
+      <div class="modal-counter" id="modal-counter"></div>
+      <img class="modal-content" id="modal-img" src="" alt="">
+      <div class="modal-caption" id="modal-caption"></div>
+      <div class="modal-nav">
+        <button class="modal-nav-btn" id="modal-prev" onclick="modalNavigate(-1)" title="Предыдущее (←)">&#8592;</button>
+        <button class="modal-nav-btn" id="modal-next" onclick="modalNavigate(1)" title="Следующее (→)">&#8594;</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
